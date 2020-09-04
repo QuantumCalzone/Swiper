@@ -15,7 +15,6 @@ class Application(tkinter.Frame):
         self.mainFrame = tkinter.Frame(master)
         self.mainFrame.pack(fill=tkinter.BOTH, expand=True, padx=_pad, pady=_pad)
 
-        # self.canvas = Canvas(master, width=300, height=300)
         self.canvas = tkinter.Canvas(self.mainFrame)
         self.canvas.pack(side=tkinter.TOP, anchor=tkinter.S, fill=tkinter.BOTH, expand=True, padx=(_pad, 0))
 

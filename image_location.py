@@ -11,13 +11,21 @@ file_path_index = -1
 image = None
 
 
+def set_entry_value(entry, value):
+    if _verbose:
+        print(f"set_entry_value( entry: {entry.get()} , value: {value} )")
+
+    entry.delete(0, END)
+    entry.insert(0, value)
+
+
 def ensure_input_is_dir(target_input_path):
     if _verbose:
         print(f"ensure_input_is_dir( target_input_path: {target_input_path} )")
 
     if not os.path.isdir(target_input_path):
         print(f"{target_input_path} is not a directory!")
-        exit()
+        # exit()
 
 
 def make_labeled_entry(label):
@@ -43,18 +51,37 @@ def open_file(event):
 
     destination = askdirectory(initialdir="/", title="Select a directory")
     entry = event.widget
-    entry.delete(0, END)
-    entry.insert(0, destination)
+    set_entry_value(entry, destination)
 
 
 def move_file(destination):
     if _verbose:
         print(f"move_file ( destination: {destination} )")
 
+    if file_path_index < 0:
+        return
+
     image_file_path = file_paths[file_path_index]
     image_file_name = os.path.basename(image_file_path)
     new_path = os.path.join(destination, image_file_name)
     shutil.move(image_file_path, new_path)
+    load_next_image()
+
+
+def on_space(event):
+    if _verbose:
+        print("on_space()")
+    load_next_image()
+
+
+def on_delete(event):
+    if _verbose:
+        print("on_delete()")
+
+    if file_path_index < 0:
+        return
+
+    os.remove(file_paths[file_path_index])
     load_next_image()
 
 
@@ -103,7 +130,7 @@ def load_next_image():
     file_path_count = len(file_paths)
     if file_path_index >= file_path_count or file_path_count == 0:
         print(f"file_path_index: {file_path_index} | file_path_count: {file_path_count}")
-        exit()
+        # exit()
     else:
         next_image = file_paths[file_path_index]
 
@@ -112,7 +139,7 @@ def load_next_image():
 
         global image
         image = ImageTk.PhotoImage(file=next_image)
-        app.canvas.create_image(image.width()/2, image.height()/2, image=image)
+        app.canvas.create_image(app.canvas.winfo_width()/2, app.canvas.winfo_height()/2, image=image)
 
 
 app = Application(master=root, left_name="Left", right_name="Right",
@@ -125,8 +152,12 @@ input_right_destination = make_labeled_entry("Right Destination: ")
 start_button = tkinter.Button(master=app.canvas, text="Start", command=start)
 start_button.pack(side=tkinter.TOP, anchor=tkinter.N, fill=tkinter.X)
 
-# first_image = file_paths[file_path_index]
-# image = ImageTk.PhotoImage(file=first_image)
-# app.canvas.create_image(image.width()/2, image.height()/2, image=image)
+set_entry_value(input_files, "/Users/georgekatsaros/Desktop/Test/Files")
+set_entry_value(input_left_destination, "/Users/georgekatsaros/Desktop/Test/Keep")
+set_entry_value(input_right_destination, "/Users/georgekatsaros/Desktop/Test/To Delete")
+
+app.master.bind("<space>", on_space)
+app.master.bind("<BackSpace>", on_delete)
+app.master.bind("<Delete>", on_delete)
 
 app.mainloop()
