@@ -152,9 +152,9 @@ input_right_destination = make_labeled_entry("Right Destination: ")
 start_button = tkinter.Button(master=app.canvas, text="Start", command=start)
 start_button.pack(side=tkinter.TOP, anchor=tkinter.N, fill=tkinter.X)
 
-set_entry_value(input_files, "/Users/georgekatsaros/Desktop/Test/Files")
-set_entry_value(input_left_destination, "/Users/georgekatsaros/Desktop/Test/Keep")
-set_entry_value(input_right_destination, "/Users/georgekatsaros/Desktop/Test/To Delete")
+# set_entry_value(input_files, "/Users/georgekatsaros/Desktop/Test/Files")
+# set_entry_value(input_left_destination, "/Users/georgekatsaros/Desktop/Test/Keep")
+# set_entry_value(input_right_destination, "/Users/georgekatsaros/Desktop/Test/To Delete")
 
 app.master.bind("<space>", on_space)
 app.master.bind("<BackSpace>", on_delete)
