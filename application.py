@@ -22,11 +22,17 @@ class Application(tkinter.Frame):
         self.swipeButtonFrame = tkinter.Frame(master, height=5)
         self.swipeButtonFrame.pack(side=tkinter.TOP, anchor=tkinter.S, pady=(0, 20))
 
-        self.button_left = ttk.Button(self.swipeButtonFrame, style="W.TButton", text=left_name, command=self.on_left)
+        self.button_left_string_var = tkinter.StringVar()
+        self.button_left_string_var.set(left_name)
+        self.button_left = ttk.Button(self.swipeButtonFrame, style="W.TButton",
+                                      textvariable=self.button_left_string_var, command=self.on_left)
         self.button_left.pack(fill=tkinter.BOTH, padx=(_pad * 2, 0), expand=True, side=tkinter.LEFT, anchor=tkinter.W)
         self.on_left_callback = on_left_callback
 
-        self.button_right = ttk.Button(self.swipeButtonFrame, style="W.TButton", text=right_name, command=self.on_right)
+        self.button_right_string_var = tkinter.StringVar()
+        self.button_right_string_var.set(right_name)
+        self.button_right = ttk.Button(self.swipeButtonFrame, style="W.TButton",
+                                       textvariable=self.button_right_string_var, command=self.on_right)
         self.button_right.pack(fill=tkinter.BOTH, padx=(_pad * 2, 0), expand=True, side=tkinter.RIGHT, anchor=tkinter.E)
         self.on_right_callback = on_right_callback
 
