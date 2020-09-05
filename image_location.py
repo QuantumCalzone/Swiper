@@ -39,7 +39,7 @@ def make_labeled_entry(label):
     entry_row_label.pack(side="left")
 
     entry = tkinter.Entry(master=input_row_frame)
-    entry.pack(fill=tkinter.BOTH, expand=True, anchor=tkinter.E)
+    entry.pack(side="left", anchor=tkinter.W, fill=tkinter.X, expand=True)
     entry.bind("<Button-1>", open_file)
 
     return entry
@@ -49,8 +49,9 @@ def open_file(event):
     if _verbose:
         print("open_file")
 
-    destination = askdirectory(initialdir="/", title="Select a directory")
     entry = event.widget
+    entry_val = entry.get()
+    destination = askdirectory(initialdir="/" if entry_val == "" else entry_val, title="Select a directory")
     set_entry_value(entry, destination)
 
 
@@ -103,9 +104,22 @@ def start():
     if _verbose:
         print("start")
 
+    global file_path_index
+    file_path_index = -1
+
     global file_paths
-    file_paths = get_all_in_dir(target_dir=input_files.get(), full_path=True, recursive=True,
+    recursive = False if input_files_recursive_var.get() == 0 else True
+    file_paths = get_all_in_dir(target_dir=input_files.get(), full_path=True, recursive=recursive,
                                 include_dirs=False, include_files=True)
+
+    real_file_paths = []
+
+    for file_path in file_paths:
+        file_extension = os.path.splitext(file_path)[1]
+        if file_extension == ".jpg" or file_extension == ".png":
+            real_file_paths.append(file_path)
+
+    file_paths = real_file_paths
     load_next_image()
 
 
@@ -139,6 +153,7 @@ def load_next_image():
 
         global image
         image = ImageTk.PhotoImage(file=next_image)
+        # image = image.subsample(app.canvas.winfo_width(), app.canvas.winfo_height())
         app.canvas.create_image(app.canvas.winfo_width()/2, app.canvas.winfo_height()/2, image=image)
 
 
@@ -147,14 +162,20 @@ app = Application(master=root, left_name="Left", right_name="Right",
 app.master.title("Swiper: File Location")
 
 input_files = make_labeled_entry("Image Directory To Swipe: ")
+
+input_files_recursive_var = IntVar()
+input_files_recursive_var.set(1)
+input_files_recursive = Checkbutton(input_files.master, text="Recursive", variable=input_files_recursive_var)
+input_files_recursive.pack(side="right")
+
 input_left_destination = make_labeled_entry("Left Destination: ")
 input_right_destination = make_labeled_entry("Right Destination: ")
 start_button = tkinter.Button(master=app.canvas, text="Start", command=start)
 start_button.pack(side=tkinter.TOP, anchor=tkinter.N, fill=tkinter.X)
 
-# set_entry_value(input_files, "/Users/georgekatsaros/Desktop/Test/Files")
-# set_entry_value(input_left_destination, "/Users/georgekatsaros/Desktop/Test/Keep")
-# set_entry_value(input_right_destination, "/Users/georgekatsaros/Desktop/Test/To Delete")
+set_entry_value(input_files, "/Users/georgekatsaros/Desktop/Photos/Unsorted")
+set_entry_value(input_left_destination, "/Users/georgekatsaros/Desktop/Photos/Sorted/Personal")
+set_entry_value(input_right_destination, "/Users/georgekatsaros/Desktop/Photos/Sorted/Not Personal")
 
 app.master.bind("<space>", on_space)
 app.master.bind("<BackSpace>", on_delete)
