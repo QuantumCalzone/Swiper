@@ -32,13 +32,15 @@ def make_labeled_entry(label):
     if _verbose:
         print(f"make_labeled_entry( label: {label} )")
 
-    input_row_frame = tkinter.Frame(master=app.canvas, height=20)
+    input_row_frame = tkinter.Frame(master=app.canvas, height=20, background=background_color)
     input_row_frame.pack(side=tkinter.TOP, anchor=tkinter.N, fill=tkinter.X)
 
-    entry_row_label = tkinter.Label(master=input_row_frame, text=label)
+    entry_row_label = tkinter.Label(master=input_row_frame, background=background_color, foreground=label_color,
+                                    text=label)
     entry_row_label.pack(side="left")
 
-    entry = tkinter.Entry(master=input_row_frame)
+    entry = tkinter.Entry(master=input_row_frame, background=background_color, foreground=label_color,
+                          highlightbackground=background_color, highlightthickness=0)
     entry.pack(side="left", anchor=tkinter.W, fill=tkinter.X, expand=True)
     entry.bind("<Button-1>", open_file)
 
@@ -165,12 +167,13 @@ input_files = make_labeled_entry("Image Directory To Swipe: ")
 
 input_files_recursive_var = IntVar()
 input_files_recursive_var.set(1)
-input_files_recursive = Checkbutton(input_files.master, text="Recursive", variable=input_files_recursive_var)
+input_files_recursive = Checkbutton(input_files.master, background=background_color, foreground=label_color,
+                                    text="Recursive", variable=input_files_recursive_var)
 input_files_recursive.pack(side="right")
 
 input_left_destination = make_labeled_entry("Left Destination: ")
 input_right_destination = make_labeled_entry("Right Destination: ")
-start_button = tkinter.Button(master=app.canvas, text="Start", command=start)
+start_button = ttk.Button(master=app.canvas, style="W.TButton", text="Start", command=start)
 start_button.pack(side=tkinter.TOP, anchor=tkinter.N, fill=tkinter.X)
 
 set_entry_value(input_files, "/Users/georgekatsaros/Desktop/Photos/Unsorted")
