@@ -1,6 +1,7 @@
 from PIL import Image, ImageTk
 from application import *
 from pythonutils.os_utils import *
+import send2trash
 import shutil
 import tkinter
 from tkinter.filedialog import *
@@ -9,6 +10,7 @@ _verbose = True
 file_paths = []
 file_path_index = -1
 image = None
+moved_images = []
 
 
 def set_entry_value(entry, value):
@@ -67,6 +69,7 @@ def move_file(destination):
     image_file_path = file_paths[file_path_index]
     image_file_name = os.path.basename(image_file_path)
     new_path = os.path.join(destination, image_file_name)
+    moved_images.append(new_path)
     shutil.move(image_file_path, new_path)
     load_next_image()
 
@@ -84,7 +87,8 @@ def on_delete(event):
     if file_path_index < 0:
         return
 
-    os.remove(file_paths[file_path_index])
+    # os.remove(file_paths[file_path_index])
+    send2trash.send2trash(file_paths[file_path_index])
     load_next_image()
 
 
@@ -123,6 +127,7 @@ def start():
 
     file_paths = real_file_paths
     load_next_image()
+    update_progress_label()
 
 
 def load_next_image():
@@ -142,6 +147,7 @@ def load_next_image():
     global file_paths
     global file_path_index
     file_path_index += 1
+    update_progress_label()
 
     file_path_count = len(file_paths)
     if file_path_index >= file_path_count or file_path_count == 0:
@@ -157,6 +163,29 @@ def load_next_image():
         image = ImageTk.PhotoImage(file=next_image)
         # image = image.subsample(app.canvas.winfo_width(), app.canvas.winfo_height())
         app.canvas.create_image(app.canvas.winfo_width()/2, app.canvas.winfo_height()/2, image=image)
+
+
+def undo(event):
+    if _verbose:
+        print("undo")
+
+    global file_path_index
+    file_path_index -= 1
+
+    image_file_path = file_paths[file_path_index]
+    image_file_name = os.path.basename(image_file_path)
+    new_path = os.path.join(input_files.get(), image_file_name)
+    shutil.move(moved_images.pop(), new_path)
+
+    file_path_index -= 1
+    load_next_image()
+
+
+def update_progress_label():
+    if _verbose:
+        print("update_progress_label")
+
+    files_left_label_string_var.set(f"{file_path_index} / {len(file_paths):n}")
 
 
 app = Application(master=root, left_name="Left", right_name="Right",
@@ -180,6 +209,12 @@ set_entry_value(input_files, "/Users/georgekatsaros/Desktop/Photos/Unsorted")
 set_entry_value(input_left_destination, "/Users/georgekatsaros/Desktop/Photos/Sorted/Personal")
 set_entry_value(input_right_destination, "/Users/georgekatsaros/Desktop/Photos/Sorted/Not Personal")
 
+files_left_label_string_var = StringVar()
+files_left_label = Label(app.master, background=background_color, foreground=label_color,
+                         textvariable=files_left_label_string_var)
+files_left_label.pack(side=tkinter.TOP, anchor=tkinter.S)
+
+app.master.bind("<z>", undo)
 app.master.bind("<space>", on_space)
 app.master.bind("<BackSpace>", on_delete)
 app.master.bind("<Delete>", on_delete)
